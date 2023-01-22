@@ -1,11 +1,15 @@
 package com.desenvlaet.managementfinance.service.impl;
 
+import com.desenvlaet.managementfinance.exception.ErrorAuthenticateException;
 import com.desenvlaet.managementfinance.exception.RuleBusinessException;
 import com.desenvlaet.managementfinance.model.User;
 import com.desenvlaet.managementfinance.repository.UserRepository;
 import com.desenvlaet.managementfinance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,12 +19,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User authenticate(String email, String password) {
-        return null;
+        Optional<User> user = repository.findByEmail(email);
+
+        if (!user.isPresent()) {
+            throw new ErrorAuthenticateException("Usuário não encontrado");
+        }
+
+        if (user.get().getPassword().equals(password)) {
+            throw new ErrorAuthenticateException("Senha inválida");
+        }
+
+        return user.get();
     }
 
     @Override
+    @Transactional
     public User saveUser(User user) {
-        return null;
+        validateEmail(user.getEmail());
+        return repository.save(user);
     }
 
     @Override
