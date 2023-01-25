@@ -17,6 +17,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository repository;
 
+    public UserServiceImpl(UserRepository repository) {
+        this.repository = repository;
+    }
+
     @Override
     public User authenticate(String email, String password) {
         Optional<User> user = repository.findByEmail(email);
