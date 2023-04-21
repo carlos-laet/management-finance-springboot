@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
             throw new ErrorAuthenticateException("Usuário não encontrado");
         }
 
-        if (user.get().getPassword().equals(password)) {
+        if (!user.get().getPassword().equals(password)) {
             throw new ErrorAuthenticateException("Senha inválida");
         }
 
