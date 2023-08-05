@@ -1,6 +1,7 @@
 package com.desenvlaet.managementfinance.service.impl;
 
 import com.desenvlaet.managementfinance.enums.StatusLaunch;
+import com.desenvlaet.managementfinance.enums.TypeLaunch;
 import com.desenvlaet.managementfinance.exception.RuleBusinessException;
 import com.desenvlaet.managementfinance.model.Launch;
 import com.desenvlaet.managementfinance.repository.LaunchRepository;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class LaunchServiceImpl implements LaunchService {
@@ -85,5 +87,27 @@ public class LaunchServiceImpl implements LaunchService {
         if (launch.getTypeLaunch() == null) {
             throw new RuleBusinessException("Informe um Tipo de Lançamento válido.");
         }
+    }
+
+    @Override
+    public Optional<Launch> obterPorId(Long id) {
+        return repository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal getBalanceUser(Long id) {
+        BigDecimal receitas = repository.getBalanceTypeLaunchAndUser(id, TypeLaunch.RECEITA.name());
+        BigDecimal despesas = repository.getBalanceTypeLaunchAndUser(id, TypeLaunch.DESPESA.name());
+
+        if (receitas == null) {
+            receitas = BigDecimal.ZERO;
+        }
+
+        if (despesas == null) {
+            despesas = BigDecimal.ZERO;
+        }
+
+        return receitas.subtract(despesas);
     }
 }

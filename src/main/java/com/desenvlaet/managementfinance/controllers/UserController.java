@@ -4,14 +4,15 @@ import com.desenvlaet.managementfinance.dto.UserDTO;
 import com.desenvlaet.managementfinance.exception.ErrorAuthenticateException;
 import com.desenvlaet.managementfinance.exception.RuleBusinessException;
 import com.desenvlaet.managementfinance.model.User;
+import com.desenvlaet.managementfinance.service.LaunchService;
 import com.desenvlaet.managementfinance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -19,6 +20,9 @@ public class UserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired
+    private LaunchService launchService;
 
     @PostMapping
     public ResponseEntity<Object> save(@RequestBody UserDTO userDTO) {
@@ -45,5 +49,17 @@ public class UserController {
         } catch (ErrorAuthenticateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("{id}/saldo")
+    public ResponseEntity getBalance(@PathVariable("id") Long id) {
+        Optional<User> user =  service.obterPorId(id);
+
+        if (user.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        BigDecimal saldo = launchService.getBalanceUser(id);
+        return ResponseEntity.ok(saldo);
     }
 }

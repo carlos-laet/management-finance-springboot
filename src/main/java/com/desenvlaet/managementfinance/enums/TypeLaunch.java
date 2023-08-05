@@ -3,5 +3,5 @@ package com.desenvlaet.managementfinance.enums;
 public enum TypeLaunch {
 
     RECEITA,
-    DESPESAS
+    DESPESA
 }
